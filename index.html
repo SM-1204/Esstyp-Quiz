@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcher Esstyp bin ich?</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f5f3ec;color:#303b35;margin:0;padding:16px}
+main{max-width:700px;margin:20px auto;background:white;padding:25px;border-radius:20px;box-shadow:0 4px 18px #0001}
+h1{text-align:center;color:#287b59;font-size:30px}
+.intro{text-align:center;line-height:1.6}
+.question{padding:17px 0;border-bottom:1px solid #e5e9e5}
+label{display:block;background:#f1f6f1;padding:12px;margin:8px 0;border-radius:10px;cursor:pointer}
+label:hover{background:#e1efe4}
+input{margin-right:9px}
+button{background:#287b59;color:white;border:0;border-radius:10px;padding:14px 20px;font-size:16px;cursor:pointer;margin-top:20px}
+#result{display:none;background:#edf6ed;padding:20px;border-radius:15px;margin-top:25px;line-height:1.6}
+#bar{height:8px;background:#319b6a;width:0}
+.progress{background:#e6e9e5;border-radius:10px;overflow:hidden}
+.small{font-size:13px;color:#68756c}
+</style>
+</head>
+<body>
+<main>
+<h1>🍽️ Welcher Esstyp bin ich?</h1>
+<p class="intro">
+Was isst du gerne? Was magst du besonders?
+Wie sieht dein Essen im Alltag aus?
+Finde heraus, welcher Esstyp du bist!
+<br><b>Es gibt keine richtigen oder falschen Antworten.</b>
+</p>
+<div class="progress"><div id="bar"></div></div>
+<p class="small" id="count">0 von 10 Fragen beantwortet</p>
+<form id="quiz">
+<div id="questions"></div>
+<button type="submit">Mein Ergebnis anzeigen 🎉</button>
+</form>
+<div id="result"></div>
+</main>
+<script>
+const questions=[
+["Was frühstückst du am liebsten?",[
+["🥐 Süßes, zum Beispiel Marmeladenbrot oder Kekse","nasch"],
+["🍕 Ich mag auch morgens gerne etwas Herzhaftes","fast"],
+["🥪 Ein Brot oder etwas, das schnell fertig ist","fix"],
+["🍎 Zum Beispiel Obst, Joghurt oder Ei","besser"]]],
+["Was nimmst du gerne mit in die Schulpause?",[
+["🍫 Schokolade oder etwas Süßes","nasch"],
+["🥨 Ein Snack, der richtig lecker schmeckt","fast"],
+["🥪 Ein belegtes Brot oder einen Wrap","fix"],
+["🍏 Obst oder Gemüse","besser"]]],
+["Was isst du gerne nach der Schule?",[
+["🍪 Erst einmal etwas Süßes","nasch"],
+["🍟 Pizza, Burger oder Pommes","fast"],
+["🍝 Nudeln oder etwas, das schnell fertig ist","fix"],
+["🥗 Zum Beispiel Reis, Gemüse oder eine Suppe","besser"]]],
+["Was naschst du am liebsten?",[
+["🍬 Schokolade, Bonbons oder Kekse","nasch"],
+["🍿 Chips oder salzige Snacks","fast"],
+["🥨 Cracker oder einen schnellen Snack","fix"],
+["🍇 Obst oder Nüsse","besser"]]],
+["Was trinkst du am liebsten?",[
+["🥤 Limonade oder süße Getränke","nasch"],
+["🧃 Cola oder andere Lieblingsgetränke","fast"],
+["💧 Was gerade da ist","fix"],
+["🚰 Wasser oder ungesüßten Tee","besser"]]],
+["Was gibt es bei dir zu Hause besonders oft?",[
+["🍰 Kuchen oder süße Leckereien","nasch"],
+["🍕 Pizza, Burger oder andere Lieblingsgerichte","fast"],
+["🍜 Nudeln, Reis oder schnelle Gerichte","fix"],
+["🥘 Zum Beispiel Gemüse, Hülsenfrüchte oder Suppe","besser"]]],
+["Was machst du, wenn du Hunger bekommst?",[
+["🍩 Ich suche mir gerne etwas Süßes","nasch"],
+["🍔 Ich hole mir etwas Leckeres","fast"],
+["🥪 Ich nehme etwas, das schnell geht","fix"],
+["🍎 Ich esse gerne Obst oder etwas anderes Frisches","besser"]]],
+["Wie oft probierst du neue Gerichte?",[
+["🧁 Wenn es etwas Süßes ist, gerne","nasch"],
+["🍕 Wenn es lecker aussieht, gerne","fast"],
+["🍝 Ich bleibe lieber bei einfachen Gerichten","fix"],
+["🌮 Ich probiere gerne verschiedene Gerichte aus","besser"]]],
+["Was ist dir beim Essen besonders wichtig?",[
+["❤️ Es soll mir schmecken, besonders wenn es süß ist","nasch"],
+["😋 Es soll richtig lecker sein","fast"],
+["⏱️ Es soll schnell fertig sein","fix"],
+["🥦 Ich esse gerne unterschiedliche Sachen","besser"]]],
+["Was würdest du dir für dein nächstes Essen wünschen?",[
+["🍰 Etwas Süßes","nasch"],
+["🍔 Pizza, Burger oder Pommes","fast"],
+["🥪 Etwas Einfaches und Schnelles","fix"],
+["🥘 Ein Gericht mit verschiedenen Zutaten","besser"]]]
+];
+
+const types={
+nasch:{
+name:"🍬 Die Naschkatze",
+desc:"Du liebst süße Sachen! Schokolade, Kekse, Kuchen oder andere Leckereien gehören zu deinen Favoriten. Süßes macht dir besonders viel Freude."
+},
+fast:{
+name:"🍕 Der Fast-Food-Fan",
+desc:"Du magst leckere Gerichte wie Pizza, Burger, Pommes oder andere Snacks. Essen soll dir vor allem richtig gut schmecken!"
+},
+fix:{
+name:"🥪 Der Fix-und-fertig-Profi",
+desc:"Du magst es einfach und unkompliziert. Ein Brot, Nudeln oder ein schneller Snack passen gut in deinen Alltag. Hauptsache, es geht ohne viel Aufwand!"
+},
+besser:{
+name:"🥗 Der Besser-Esser",
+desc:"Du isst gerne unterschiedliche Lebensmittel. Obst, Gemüse, Reis, Brot oder verschiedene andere Gerichte können bei dir auf dem Speiseplan stehen. Du probierst gerne aus!"
+}
+};
+
+const area=document.getElementById("questions");
+questions.forEach((q,i)=>{
+ const div=document.createElement("div");
+ div.className="question";
+ const h=document.createElement("h3");
+ h.textContent=q[0];
+ div.appendChild(h);
+ q[1].forEach((a,j)=>{
+  const label=document.createElement("label");
+  const input=document.createElement("input");
+  input.type="radio";
+  input.name="q"+i;
+  input.value=a[1];
+  input.addEventListener("change",progress);
+  label.appendChild(input);
+  label.appendChild(document.createTextNode(a[0]));
+  div.appendChild(label);
+ });
+ area.appendChild(div);
+});
+
+function progress(){
+ const n=questions.filter((q,i)=>document.querySelector('input[name="q'+i+'"]:checked')).length;
+ document.getElementById("count").textContent=n+" von 10 Fragen beantwortet";
+ document.getElementById("bar").style.width=(n*10)+"%";
+}
+
+document.getElementById("quiz").addEventListener("submit",e=>{
+ e.preventDefault();
+ const score={nasch:0,fast:0,fix:0,besser:0};
+ for(let i=0;i<questions.length;i++){
+  const answer=document.querySelector('input[name="q'+i+'"]:checked');
+  if(!answer){alert("Bitte beantworte noch alle Fragen.");return;}
+  score[answer.value]++;
+ }
+ const max=Math.max(...Object.values(score));
+ const winners=Object.keys(score).filter(k=>score[k]===max);
+ const result=document.getElementById("result");
+ let html="<h2>🎉 Dein Ergebnis!</h2>";
+ if(winners.length===1){
+  const t=types[winners[0]];
+  html+="<h3>"+t.name+"</h3><p>"+t.desc+"</p>";
+ }else{
+  html+="<h3>🌈 Du bist eine Mischung aus mehreren Esstypen!</h3><p>Bei dir passen mehrere Beschreibungen. Das zeigt, dass du unterschiedliche Essvorlieben hast:</p><ul>";
+  winners.forEach(k=>html+="<li>"+types[k].name+"</li>");
+  html+="</ul>";
+ }
+ html+="<p><b>Denk daran:</b> Das ist ein Spiel und keine Bewertung. Jeder Mensch isst anders. Und das darf auch so sein!</p>";
+ html+="<button type='button' onclick='location.reload()'>Quiz noch einmal machen</button>";
+ result.innerHTML=html;
+ result.style.display="block";
+ result.scrollIntoView({behavior:"smooth"});
+});
+</script>
+</body>
+</html>
+
